@@ -1,0 +1,8 @@
+.superpowers/
+__pycache__/
+.pytest_cache/
+.venv/
+outputs/*
+!outputs/.gitkeep
+*.pyc
+*.log
