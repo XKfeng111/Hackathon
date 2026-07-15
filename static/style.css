@@ -84,3 +84,88 @@ footer { border-top:1px solid rgba(23,35,28,.12); max-width:1124px; margin:80px 
 footer>span { color:var(--ink); font-weight:700; font-size:14px; }
 @media(max-width:920px){.type-choices,.reference-choices{grid-template-columns:1fr}.active-upload{grid-template-columns:1fr;gap:24px}.choice-copy small{white-space:normal}.section-heading{display:block}.downloads{justify-content:flex-start;margin-top:12px}dl{grid-template-columns:1fr}}
 @media(max-width:640px){.nav,.upload-section,.feedback-section{padding-left:16px;padding-right:16px}.hero{padding:0 16px;margin-top:58px}h1{font-size:48px}.status{display:none}.section-heading h2{font-size:23px}.active-upload{padding:20px}.feedback-panel,.prompt-card{padding:22px}footer{margin-left:16px;margin-right:16px;align-items:flex-start;flex-direction:column;justify-content:center;gap:8px}.file-badge{white-space:normal;text-align:right}}
+
+/* Step 1 polish: keep Step 2 unchanged, make reference upload cards clean and English-only. */
+.prompt-library-section {
+  margin-bottom: 62px;
+}
+
+.prompt-library-form {
+  padding: 30px;
+}
+
+.reference-choices {
+  align-items: stretch;
+  margin-top: 10px;
+}
+
+.reference-choice {
+  position: relative;
+  min-height: 230px;
+  grid-template-columns: 62px 1fr;
+  gap: 16px;
+  padding: 22px 20px;
+  align-content: start;
+}
+
+.reference-choice .choice-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  font-size: 24px;
+}
+
+.reference-choice .choice-copy strong {
+  font-size: 24px;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+}
+
+.reference-choice .choice-copy small {
+  margin-top: 8px;
+  white-space: normal;
+  line-height: 1.35;
+  max-width: 310px;
+}
+
+.reference-choice .mode-chip {
+  margin-top: 12px;
+}
+
+.visually-hidden-file {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.upload-pill {
+  grid-column: 1 / -1;
+  justify-self: start;
+  margin-top: 12px;
+  border-radius: 10px;
+  padding: 10px 13px;
+  background: var(--soft);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.file-hint {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.reference-choice:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--soft);
+}
+
+.prompt-library-form > .privacy-note {
+  max-width: 620px;
+  margin: 18px auto 0;
+}

@@ -39,7 +39,7 @@
               <span class="choice-icon" aria-hidden="true">{{ group.label[0] }}</span>
               <span class="choice-copy"><strong>{{ group.label }}</strong><small>{{ group.description }}</small></span>
               <span class="mode-chip">{{ mode }}</span>
-              <input type="file" name="{{ group.field }}" accept=".pdf,.docx,.pptx,.txt,.md" multiple>
+              <input class="visually-hidden-file" id="{{ group.field }}" type="file" name="{{ group.field }}" accept=".pdf,.docx,.pptx,.txt,.md" multiple><span class="upload-pill">Upload files</span><span class="file-hint">PDF, DOCX, PPTX, TXT, MD</span>
             </label>
           {% endfor %}
         </div>
@@ -152,3 +152,4 @@
   </main>
 </body>
 </html>
+
