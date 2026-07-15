@@ -1,6 +1,6 @@
-# Hackathon Extract Raw Materials
+﻿# Hackathon
 
-A standalone local Flask demo for turning raw research materials into **draft structured JSONL** records.
+A local Flask demo for building a PI-style feedback workflow from raw research materials, draft JSONL records, and mode-specific prompts.
 
 The workflow is intentionally semi-automatic:
 
@@ -125,7 +125,8 @@ It creates a clean draft that is easier for a human to review, edit, and approve
 
 ## Contributors and acknowledgements
 
-- Xianke Feng — project owner and dataset workflow design.
-- ChatGPT — AI coding assistant for planning, implementation, testing, and documentation support.
+- Xianke Feng 鈥?project owner and dataset workflow design.
+- ChatGPT 鈥?AI coding assistant for planning, implementation, testing, and documentation support.
 
 Note: GitHub's automatic contributor list is generated from commit authors. This acknowledgement records ChatGPT's assistance in the project documentation.
+
