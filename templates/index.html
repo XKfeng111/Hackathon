@@ -42,7 +42,7 @@
               </select>
             </label>
           </div>
-          <div class="mentor-creator">
+          <div class="mentor-creator" data-mentor-creator {% if selected_prompt_mentor %}hidden{% endif %}>
             <label>Create Your Mentor
               <input type="text" name="prompt_mentor_name" maxlength="80" placeholder="e.g. Lab Mentor">
             </label>
@@ -67,7 +67,6 @@
                 <span class="selected-summary"><span class="selected-check" aria-hidden="true">&#10003;</span><span data-file-summary>No files selected yet</span></span>
                 <span class="selected-file-list" data-file-list></span>
                 {% if stored_prompt_files[mode] %}
-                  <span class="stored-file-heading">Stored in this mentor</span>
                   <span class="stored-file-list">
                     {% for filename in stored_prompt_files[mode] %}
                       <span class="selected-file-name stored-file-name">{{ filename }}</span>

@@ -31,5 +31,27 @@
       input.addEventListener('change', function () { updateCard(input); });
       updateCard(input);
     });
+
+    function toggleMentorCreator(select) {
+      var form = select.closest('form');
+      if (!form) return;
+      var creator = form.querySelector('[data-mentor-creator]');
+      if (!creator) return;
+      var input = creator.querySelector('input[name="prompt_mentor_name"]');
+
+      creator.hidden = Boolean(select.value);
+      if (input) {
+        if (select.value) {
+          input.removeAttribute('required');
+        } else {
+          input.setAttribute('required', 'required');
+        }
+      }
+    }
+
+    document.querySelectorAll('[data-selected-mentor]').forEach(function (select) {
+      select.addEventListener('change', function () { toggleMentorCreator(select); });
+      toggleMentorCreator(select);
+    });
   });
 }());

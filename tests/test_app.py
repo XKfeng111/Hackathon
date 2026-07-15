@@ -312,9 +312,22 @@ def test_refresh_preserves_selected_mentor_and_files_but_hides_prompt_results(tm
     assert response.status_code == 200
     assert "Dr. Refresh Mentor" in html
     assert "refresh.txt" in html
+    assert "Stored in this mentor" not in html
     assert "PI Style Prompts Ready" not in html
     assert "prompt-output-title" not in html
     assert "TXT files updated locally in" not in html
+
+
+def test_mentor_creator_is_prompted_when_no_existing_mentor_is_selected():
+    html = Path("templates/index.html").read_text(encoding="utf-8")
+    javascript = Path("static/library_uploads.js").read_text(encoding="utf-8")
+
+    assert 'data-selected-mentor' in html
+    assert 'data-mentor-creator' in html
+    assert "toggleMentorCreator" in javascript
+    assert "creator.hidden = Boolean(select.value)" in javascript
+    assert "setAttribute('required', 'required')" in javascript
+    assert "removeAttribute('required')" in javascript
 
 
 def test_mentor_files_are_ignored_by_git():
