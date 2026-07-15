@@ -141,3 +141,69 @@ def test_prompt_builder_creates_three_mode_specific_txt_artifacts():
     assert "strict PI style" in artifacts["slides_talk_pi"].content
     assert "claim" in artifacts["paper_proposal_pi"].content.lower()
 
+
+def test_prompt_builder_extracts_specific_professor_concerns_from_uploaded_files():
+    from raw_materials.prompt_builder import build_mode_prompt_artifacts
+
+    grouped_chunks = {
+        "meeting_research_pi": [
+            {
+                "source_file": "meeting_notes.txt",
+                "chunks": [
+                    "Professor repeatedly asks for a missing control before trusting the WVTR mechanism.",
+                    "Clarify the next experiment, sample size, and whether the hypothesis can be falsified.",
+                ],
+            }
+        ],
+        "slides_talk_pi": [],
+        "paper_proposal_pi": [],
+    }
+
+    artifact = build_mode_prompt_artifacts(grouped_chunks)["meeting_research_pi"]
+    content = artifact.content
+
+    assert "Professor concern profile learned from uploaded files:" in content
+    assert "missing control" in content
+    assert "WVTR mechanism" in content
+    assert "sample size" in content
+    assert "hypothesis can be falsified" in content
+    assert "For research ideas and meeting minutes, prioritize" in content
+    assert "Generated PI-style prompt:" in content
+    assert "meeting_notes.txt" in content
+
+def test_prompt_builder_writes_polished_prompt_without_filler_or_fragments():
+    from raw_materials.prompt_builder import build_mode_prompt_artifacts
+
+    grouped_chunks = {
+        "meeting_research_pi": [
+            {
+                "source_file": "rough_meeting_transcript.txt",
+                "chunks": [
+                    (
+                        "Like, just because the data show insensible perspiration, ok, we cannot stop there. "
+                        "Review Dongjing He's work on skin as a. "
+                        "The professor asks whether topology-controlled water transport is backed by directional "
+                        "water transport data, proper controls, and a falsifiable mechanism."
+                    )
+                ],
+            }
+        ],
+        "slides_talk_pi": [],
+        "paper_proposal_pi": [],
+    }
+
+    artifact = build_mode_prompt_artifacts(grouped_chunks)["meeting_research_pi"]
+    generated = artifact.content.split("Generated PI-style prompt:", 1)[1].split("PI-style response rules:", 1)[0]
+
+    assert "Pay special attention to like" not in generated
+    assert "like, just, because, ok" not in generated.lower()
+    assert "just because" not in generated.lower()
+    assert " ok" not in generated.lower()
+    assert "skin as a" not in generated
+    assert "When reviewing research ideas or meeting minutes" in generated
+    assert "topology-controlled water transport" not in generated
+    assert "directional water transport data" not in generated
+    assert "controls" in generated
+    assert "falsifiable" in generated
+    assert "Use the professor's style" in generated
+
