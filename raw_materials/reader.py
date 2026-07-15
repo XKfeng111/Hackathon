@@ -1,11 +1,11 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import re
 from io import BytesIO
 from pathlib import Path
 
 
-SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".txt", ".md"}
+SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".pptx", ".txt", ".md"}
 
 
 def is_supported_filename(filename: str) -> bool:
@@ -60,6 +60,27 @@ def extract_pdf(file_bytes: bytes) -> str:
     return "\n\n".join(pages)
 
 
+def extract_pptx(file_bytes: bytes) -> str:
+    from pptx import Presentation
+
+    presentation = Presentation(BytesIO(file_bytes))
+    sections: list[str] = []
+    for slide_number, slide in enumerate(presentation.slides, start=1):
+        slide_parts: list[str] = []
+        for shape in slide.shapes:
+            text = getattr(shape, "text", "")
+            if text and text.strip():
+                slide_parts.append(text.strip())
+            if getattr(shape, "has_table", False):
+                for row in shape.table.rows:
+                    cells = [cell.text.strip() for cell in row.cells if cell.text.strip()]
+                    if cells:
+                        slide_parts.append(" | ".join(cells))
+        if slide_parts:
+            sections.append(f"[Slide {slide_number}]\n" + "\n".join(slide_parts))
+    return "\n\n".join(sections)
+
+
 def extract_text_from_upload(file_bytes: bytes, filename: str) -> str:
     extension = Path(filename).suffix.lower()
     if extension not in SUPPORTED_EXTENSIONS:
@@ -72,6 +93,8 @@ def extract_text_from_upload(file_bytes: bytes, filename: str) -> str:
         text = extract_docx(file_bytes)
     elif extension == ".pdf":
         text = extract_pdf(file_bytes)
+    elif extension == ".pptx":
+        text = extract_pptx(file_bytes)
     else:
         raise ValueError(f"Unsupported file type: {extension}")
 

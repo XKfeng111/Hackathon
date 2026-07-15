@@ -1,4 +1,4 @@
-import json
+﻿import json
 
 from raw_materials.chunker import chunk_text
 from raw_materials.jsonl_builder import (
@@ -81,3 +81,63 @@ def test_serializers_create_jsonl_pretty_json_and_markdown_preview():
     assert "# Draft JSONL Preview" in preview
     assert "Talk Demo" in preview
     assert "verified_by_human: false" in preview
+
+def test_supported_filename_accepts_pptx_reference_materials():
+    assert is_supported_filename("group_meeting_slides.pptx")
+
+
+def test_extract_text_from_pptx_bytes_reads_slide_text():
+    from io import BytesIO
+
+    from pptx import Presentation
+
+    presentation = Presentation()
+    slide = presentation.slides.add_slide(presentation.slide_layouts[5])
+    slide.shapes.title.text = "WVTR mechanism slide"
+    text_box = slide.shapes.add_textbox(0, 0, 5000000, 1000000)
+    text_box.text = "Remove duplicate panels and clarify the takeaway."
+    pptx_bytes = BytesIO()
+    presentation.save(pptx_bytes)
+
+    text = extract_text_from_upload(pptx_bytes.getvalue(), "slides.pptx")
+
+    assert "WVTR mechanism slide" in text
+    assert "Remove duplicate panels" in text
+
+
+def test_prompt_builder_creates_three_mode_specific_txt_artifacts():
+    from raw_materials.prompt_builder import build_mode_prompt_artifacts
+
+    grouped_chunks = {
+        "meeting_research_pi": [
+            {
+                "source_file": "meeting.txt",
+                "chunks": ["Clarify the next experiment and add a missing control."],
+            }
+        ],
+        "slides_talk_pi": [
+            {
+                "source_file": "slides.txt",
+                "chunks": ["Remove duplicate panels and make the slide takeaway explicit."],
+            }
+        ],
+        "paper_proposal_pi": [
+            {
+                "source_file": "proposal.txt",
+                "chunks": ["The central claim is too broad for the current evidence."],
+            }
+        ],
+    }
+
+    artifacts = build_mode_prompt_artifacts(grouped_chunks)
+
+    assert set(artifacts) == {
+        "meeting_research_pi",
+        "slides_talk_pi",
+        "paper_proposal_pi",
+    }
+    assert artifacts["meeting_research_pi"].filename == "meeting_research_pi_prompt.txt"
+    assert "MODE: meeting_research_pi" in artifacts["meeting_research_pi"].content
+    assert "strict PI style" in artifacts["slides_talk_pi"].content
+    assert "claim" in artifacts["paper_proposal_pi"].content.lower()
+

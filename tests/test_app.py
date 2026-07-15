@@ -1,4 +1,4 @@
-import json
+﻿import json
 from io import BytesIO
 
 from app import app
@@ -110,3 +110,53 @@ def test_generate_requires_project_name(tmp_path):
     )
     assert response.status_code == 400
     assert b"Project name is required" in response.data
+
+def test_home_page_shows_reference_prompt_library_panel(tmp_path):
+    client = client_with_tmp_outputs(tmp_path)
+    response = client.get("/")
+    assert response.status_code == 200
+    html = response.data.decode("utf-8")
+    assert "Build Your PI Style Library" in html
+    assert "Research Ideas / Meeting Minutes" in html
+    assert "Talks / Presentations / Slides" in html
+    assert "Papers / Proposals" in html
+    assert "Generate PI-Style Prompts" in html
+
+
+def test_generate_prompts_creates_three_txt_prompt_downloads(tmp_path):
+    client = client_with_tmp_outputs(tmp_path)
+    response = client.post(
+        "/generate-prompts",
+        data={
+            "project_name": "WVTR",
+            "research_files": (
+                BytesIO(b"Clarify the next experiment and add a missing control."),
+                "meeting.txt",
+            ),
+            "slide_files": (
+                BytesIO(b"Remove duplicate panels and state the slide takeaway."),
+                "slides.txt",
+            ),
+            "paper_files": (
+                BytesIO(b"The claim is too broad for the current evidence."),
+                "proposal.txt",
+            ),
+        },
+        content_type="multipart/form-data",
+    )
+
+    assert response.status_code == 200
+    html = response.data.decode("utf-8")
+    assert "PI Style Prompts Ready" in html
+    assert "meeting_research_pi_prompt.txt" in html
+    assert "slides_talk_pi_prompt.txt" in html
+    assert "paper_proposal_pi_prompt.txt" in html
+    run_id = response.headers["X-Prompt-Run-Id"]
+
+    download_response = client.get(f"/download/{run_id}/meeting_research_pi_prompt")
+    assert download_response.status_code == 200
+    assert download_response.headers["Content-Type"].startswith("text/plain")
+    body = download_response.data.decode("utf-8")
+    assert "MODE: meeting_research_pi" in body
+    assert "Clarify the next experiment" in body
+
