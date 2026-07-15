@@ -341,6 +341,82 @@ def test_mentor_dropdown_syncs_existing_file_display():
     assert "stored-file-list" in javascript
 
 
+def test_delete_selected_mentor_removes_uploaded_files_and_prompts(tmp_path):
+    client = client_with_tmp_outputs(tmp_path)
+
+    create_response = client.post(
+        "/generate-prompts",
+        data={
+            "prompt_mentor_name": "Dr. Delete Mentor",
+            "research_files": (
+                BytesIO(b"Delete this mentor's raw file and prompt files."),
+                "delete_me.txt",
+            ),
+        },
+        content_type="multipart/form-data",
+    )
+    assert create_response.status_code == 200
+
+    mentor_dir = tmp_path / "mentor_files" / "dr-delete-mentor"
+    assert (mentor_dir / "meeting_research_pi" / "raw" / "delete_me.txt").exists()
+    assert (mentor_dir / "meeting_research_pi" / "prompt.txt").exists()
+    assert (mentor_dir / "all_pi_style_prompts.txt").exists()
+
+    delete_response = client.post(
+        "/delete-mentor",
+        data={"selected_prompt_mentor": "dr-delete-mentor"},
+        follow_redirects=True,
+    )
+
+    assert delete_response.status_code == 200
+    assert not mentor_dir.exists()
+    html = delete_response.data.decode("utf-8")
+    assert "Dr. Delete Mentor" not in html
+    assert "delete_me.txt" not in html
+    assert "No mentor selected" in html
+
+
+def test_home_page_has_delete_mentor_button_when_mentor_selected(tmp_path):
+    client = client_with_tmp_outputs(tmp_path)
+
+    client.post(
+        "/generate-prompts",
+        data={
+            "prompt_mentor_name": "Dr. UI Delete",
+            "research_files": (
+                BytesIO(b"Show delete button for this selected mentor."),
+                "ui_delete.txt",
+            ),
+        },
+        content_type="multipart/form-data",
+    )
+
+    response = client.get("/?prompt_mentor=dr-ui-delete")
+    html = response.data.decode("utf-8")
+    javascript = Path("static/library_uploads.js").read_text(encoding="utf-8")
+
+    assert 'formaction="/delete-mentor"' in html
+    assert 'data-delete-mentor-button' in html
+    assert "Delete mentor" in html
+    assert "toggleDeleteMentorButton" in javascript
+    assert "button.hidden = !select.value" in javascript
+
+
+def test_delete_mentor_rejects_missing_or_invalid_selection(tmp_path):
+    client = client_with_tmp_outputs(tmp_path)
+
+    missing_response = client.post("/delete-mentor", data={})
+    invalid_response = client.post(
+        "/delete-mentor",
+        data={"selected_prompt_mentor": "../outside"},
+    )
+
+    assert missing_response.status_code == 400
+    assert invalid_response.status_code == 400
+    assert b"Please select a mentor to delete" in missing_response.data
+    assert b"Please select an existing mentor to delete" in invalid_response.data
+
+
 def test_mentor_files_are_ignored_by_git():
     gitignore = Path(".gitignore").read_text(encoding="utf-8")
 

@@ -119,6 +119,13 @@ footer>span { color:var(--ink); font-weight:700; font-size:14px; }
   text-transform: uppercase;
 }
 
+.mentor-selector {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+}
+
 .mentor-selector select,
 .mentor-creator input {
   width: 100%;
@@ -130,6 +137,24 @@ footer>span { color:var(--ink); font-weight:700; font-size:14px; }
   color: var(--ink);
   font: 600 13px/1.2 system-ui, sans-serif;
   outline: none;
+}
+
+.delete-mentor-button {
+  border: 1px solid rgba(125,45,38,.22);
+  border-radius: 12px;
+  padding: 12px 13px;
+  background: #fff6f2;
+  color: #7d2d26;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.delete-mentor-button:hover {
+  background: #f8e6df;
+  border-color: rgba(125,45,38,.38);
 }
 
 .mentor-selector select:focus,

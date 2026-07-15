@@ -3,6 +3,7 @@
 import os
 import re
 import secrets
+import shutil
 import time
 import json
 import html
@@ -13,7 +14,7 @@ from urllib import request as urllib_request
 from urllib.error import URLError
 
 from docx import Document
-from flask import Flask, Response, abort, jsonify, render_template, request, send_file, url_for
+from flask import Flask, Response, abort, jsonify, redirect, render_template, request, send_file, url_for
 from markupsafe import Markup
 from pptx import Presentation
 from pypdf import PdfReader
@@ -653,6 +654,19 @@ def save_mentor_prompt_outputs(slug: str, artifacts: dict[str, PromptArtifact]) 
     return directory
 
 
+def delete_prompt_mentor(slug: str) -> None:
+    safe_slug = mentor_slug(slug)
+    if safe_slug != slug.strip().lower():
+        raise ValueError("Please select an existing mentor to delete.")
+    directory = mentor_dir(safe_slug).resolve()
+    root = get_mentor_library_dir().resolve()
+    if root not in directory.parents:
+        raise ValueError("Please select an existing mentor to delete.")
+    if not directory.exists() or read_prompt_mentor(safe_slug) is None:
+        raise ValueError("Please select an existing mentor to delete.")
+    shutil.rmtree(directory)
+
+
 def render_home(**context: Any):
     prompt_mentors = list_prompt_mentors()
     selected_prompt_mentor = context.get("selected_prompt_mentor", "")
@@ -795,6 +809,18 @@ def generate_prompts():
     )
     response.headers["X-Prompt-Run-Id"] = run_id
     return response
+
+
+@app.post("/delete-mentor")
+def delete_mentor():
+    selected_slug = request.form.get("selected_prompt_mentor", "").strip().lower()
+    if not selected_slug:
+        return render_home(error="Please select a mentor to delete."), 400
+    try:
+        delete_prompt_mentor(selected_slug)
+    except ValueError as exc:
+        return render_home(error=str(exc)), 400
+    return redirect(url_for("home") + "#prompt-library")
 
 
 def compact_prompt_preview(artifact: PromptArtifact) -> str:

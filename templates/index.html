@@ -41,6 +41,15 @@
                 {% endfor %}
               </select>
             </label>
+            <button
+              class="delete-mentor-button"
+              type="submit"
+              formaction="{{ url_for('delete_mentor') }}"
+              formmethod="post"
+              formnovalidate
+              data-delete-mentor-button
+              {% if not selected_prompt_mentor %}hidden{% endif %}
+            >Delete mentor</button>
           </div>
           <div class="mentor-creator" data-mentor-creator {% if selected_prompt_mentor %}hidden{% endif %}>
             <label>Create Your Mentor

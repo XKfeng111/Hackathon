@@ -49,6 +49,14 @@
       }
     }
 
+    function toggleDeleteMentorButton(select) {
+      var form = select.closest('form');
+      if (!form) return;
+      var button = form.querySelector('[data-delete-mentor-button]');
+      if (!button) return;
+      button.hidden = !select.value;
+    }
+
     function clearStoredFileDisplays(form) {
       if (!form) return;
       form.querySelectorAll('.stored-file-list').forEach(function (list) {
@@ -59,6 +67,7 @@
 
     function handleMentorSelectionChange(select) {
       toggleMentorCreator(select);
+      toggleDeleteMentorButton(select);
       var form = select.closest('form');
       if (select.value) {
         var homeUrl = select.getAttribute('data-mentor-home-url') || '/';
@@ -74,6 +83,7 @@
     document.querySelectorAll('[data-selected-mentor]').forEach(function (select) {
       select.addEventListener('change', function () { handleMentorSelectionChange(select); });
       toggleMentorCreator(select);
+      toggleDeleteMentorButton(select);
     });
   });
 }());
