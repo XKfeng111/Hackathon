@@ -122,3 +122,10 @@ outputs/                       Generated local outputs
 This project does **not** produce final verified training data automatically.
 
 It creates a clean draft that is easier for a human to review, edit, and approve.
+
+## Contributors and acknowledgements
+
+- Xianke Feng — project owner and dataset workflow design.
+- ChatGPT — AI coding assistant for planning, implementation, testing, and documentation support.
+
+Note: GitHub's automatic contributor list is generated from commit authors. This acknowledgement records ChatGPT's assistance in the project documentation.
